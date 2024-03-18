@@ -19,19 +19,19 @@ def BaseBezier(pointSet: List[Point]) -> List[Point]:
         time_start = 1000*time.perf_counter()
         for i in range(1, lenSet):
             pointListTemp.append(GetMiddlePoint(pointList[i-1], pointList[i]))
+        time_stop = 1000*time.perf_counter()
+        a = time_stop - time_start
+        timeDnC += a
+
+        x = np.array([i.x for i in pointList])
+        y = np.array([i.y for i in pointList])
+        ax1.plot(x,y, color = 'black', linewidth = 1, ls = 'dashed')
 
         pointList = pointListTemp
         lenSet -= 1
         resultList.insert(counterIdx, pointList[lenSet-1])
         resultList.insert(counterIdx, pointList[0])
-        counterIdx += 1
-        time_stop = 1000*time.perf_counter()
-        a = time_stop - time_start
-        timeDnC += a
-        
-        x = np.array([i.x for i in pointListTemp])
-        y = np.array([i.y for i in pointListTemp])
-        ax1.plot(x,y, color = 'black', linewidth = 1, ls = 'dashed')
+        counterIdx += 1  
 
     resultList.insert(counterIdx, GetMiddlePoint(pointList[0], pointList[1]))
        
@@ -61,30 +61,30 @@ def BezierPointGenerator(pointSet: List[Point], iteration: int, nControl: int):
         BezierPointGenerator(setBaru[:nControl], iteration-1, nControl)
         BezierPointGenerator(setBaru[nControl-1:], iteration-1, nControl)
 
-def DivideNConquer(controlSet: List[Point], iteration: int):
-    BezierPointGenerator(controlSet, iteration, len(controlSet))
+def DivideNConquer(nControl:int, controlSet: List[Point], iteration: int):
+    BezierPointGenerator(controlSet, iteration, nControl)
+    strDnC = "Execution Time: " + str(round(timeDnC,3)) + " ms"
+    fig1.suptitle(strDnC, fontsize=10)
 
-def findPointBruteforce(controlSet: List[Point], xValue: int):
+def findPointBruteforce(nControl:int, controlSet: List[Point], xValue: int):
     resultX = 0
     resultY = 0
-    lenSet = len(controlSet)
-    for i in range(lenSet):
-        a = ((1 - xValue)**(lenSet - 1 - i))*(xValue**i)*getCombination(lenSet-1, i)
+    for i in range(nControl):
+        a = ((1 - xValue)**(nControl - 1 - i))*(xValue**i)*getCombination(nControl-1, i)
         resultX += a*controlSet[i].x
         resultY += a*controlSet[i].y
     return resultX, resultY
 
-def BruteForce(controlSet: List[Point], iteration: int):
+def BruteForce(nControl: int, controlSet: List[Point], iteration: int):
     global timeBF
     xResult = []
     yResult = []
 
-    
     time_start = time.perf_counter()
 
     i = 0
     while i <= 1:
-        x, y = findPointBruteforce(controlSet, i)
+        x, y = findPointBruteforce(nControl, controlSet, i)
         
         xResult.append(x)
         yResult.append(y)
@@ -96,7 +96,8 @@ def BruteForce(controlSet: List[Point], iteration: int):
 
     ax2.plot(np.array(xResult), np.array(yResult), color = 'r')
 
-a = [Point(0,0), Point(1,5), Point(5,4), Point(6,0), Point(4,-2)]
+    strBF = "Execution Time: " + str(round(timeBF,3)) + " ms"
+    fig2.suptitle(strBF, fontsize=10)
 
 fig2, ax2 = plt.subplots()
 ax2.set_title('Bruteforce')
@@ -104,13 +105,3 @@ timeBF = 0
 fig1, ax1 = plt.subplots()
 ax1.set_title('Divide and Conquer')
 timeDnC = 0
-
-BruteForce(a, 3)
-DivideNConquer(a, 3)
-
-print("Execution Time:")
-print(round(timeBF,3), 'ms Bruteforce')
-print(round(timeDnC,3), 'ms DnC')
-
-plt.legend()
-plt.show()
