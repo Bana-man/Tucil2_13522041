@@ -27,7 +27,7 @@ menentukan bentuk dan arah kurva.
 ## How to Run
 1. Clone repository.
 ```
-git clone https://github.com/PanjiSri/Tubes1_JadiMesin.git
+git clone https://github.com/Bana-man/Tucil2_13522041.git
 ```
 2. Masuk ke root directory dari project.
 ```
